@@ -68,11 +68,12 @@ h1{margin:0 0 18px 0;font-size:22px}
 .product.has-bg-image{background-size:cover;background-position:center}
 
 /* mockup SVGs */
-.mockup{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;height:auto;opacity:0.12;pointer-events:none;fill:#000}
+.mockup{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;height:auto;opacity:0;pointer-events:none;fill:#000}
 .show-tshirt .mockup-tshirt,.show-mug .mockup-mug,.show-poster .mockup-poster{opacity:0.22}
 
 /* mug mockup image */
-.mug-mockup-image{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:85%;height:auto;max-width:100%;max-height:100%;opacity:0.15;pointer-events:none;object-fit:contain}
+.mug-mockup-image{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:85%;height:auto;max-width:100%;max-height:100%;opacity:0;pointer-events:none;object-fit:contain}
+.show-mug .mug-mockup-image{opacity:0.15}
 
 .preset-buttons{display:flex;gap:8px;margin-top:8px}
 .preset-btn{padding:8px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
