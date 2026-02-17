@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,59 +14,235 @@
 		<h1>Personalize Your Product</h1>
 
 		<div class="controls">
-			<label class="control-item">Name
+			<div class="control-item">
+				<label for="nameInput">Name</label>
 				<input id="nameInput" type="text" placeholder="Type your name" autocomplete="off">
-			</label>
+			</div>
 
-			<label class="control-item">Color
+			<div class="control-item">
+				<label for="colorInput">Color</label>
 				<input id="colorInput" type="color" value="#111111">
-			</label>
+			</div>
 
-			<label class="control-item">Font
+			<div class="control-item">
+				<label for="fontSelect">Font</label>
 				<select id="fontSelect">
 					<option value="'Montserrat', sans-serif">Montserrat</option>
 					<option value="'Roboto', sans-serif">Roboto</option>
 					<option value="'Great Vibes', cursive">Great Vibes</option>
 				</select>
-			</label>
+			</div>
 
-			<label class="control-item">Size
+			<div class="control-item">
+				<label for="sizeRange">Size <span id="sizeValue">36px</span></label>
 				<input id="sizeRange" type="range" min="18" max="72" value="36">
-			</label>
+			</div>
+
+			<div class="control-item">
+				<label for="mockupSelect">Mockup</label>
+				<select id="mockupSelect">
+					<option value="none">None</option>
+					<option value="tshirt">T-shirt</option>
+					<option value="mug">Mug</option>
+					<option value="poster">Poster</option>
+				</select>
+			</div>
+
+			<div class="control-item">
+				<label for="bgUpload">Background Image</label>
+				<input id="bgUpload" type="file" accept="image/*">
+			</div>
+
+			<div class="control-item presets">
+				<label>Presets</label>
+				<div class="preset-buttons">
+					<button id="presetMinimal" class="preset-btn" data-font="'Montserrat', sans-serif" data-color="#111111" data-size="28">Minimal</button>
+					<button id="presetBold" class="preset-btn" data-font="'Montserrat', sans-serif" data-color="#b91c1c" data-size="48">Bold</button>
+					<button id="presetElegant" class="preset-btn" data-font="'Great Vibes', cursive" data-color="#0b76ef" data-size="42">Elegant</button>
+				</div>
+			</div>
+
+			<div class="control-item">
+				<label>&nbsp;</label>
+				<button id="resetBtn" class="reset-btn">Reset</button>
+			</div>
 		</div>
 
 		<div class="product-wrap">
-			<div class="product">
+			<div class="product" id="product">
+				<!-- faint mockups -->
+				<svg class="mockup mockup-tshirt" viewBox="0 0 200 140" aria-hidden="true">
+					<path d="M20 10 L40 10 L50 30 L150 30 L160 10 L180 10 L170 40 L170 120 L30 120 L30 40 Z" fill="#000" />
+				</svg>
+				<svg class="mockup mockup-mug" viewBox="0 0 200 140" aria-hidden="true">
+					<path d="M30 20 h80 a20 20 0 0 1 20 20 v40 a20 20 0 0 1 -20 20 h-80 z" fill="#000" />
+					<path d="M110 40 a18 18 0 0 1 18 18 v14 a18 18 0 0 1 -18 18" fill="#000" />
+				</svg>
+				<svg class="mockup mockup-poster" viewBox="0 0 200 140" aria-hidden="true">
+					<rect x="24" y="12" width="152" height="116" fill="#000" rx="6" />
+				</svg>
+
 				<div class="product-face">
 					<span id="namePreview" class="name">Your Name</span>
 				</div>
 			</div>
 		</div>
 
-		<p class="help">Type a name and adjust color, font, and size — the preview updates live.</p>
+		<p class="help">Type a name and adjust color, font, and size — the preview updates live. Upload an image to use as a product background or choose a mockup.</p>
 	</div>
 
 	<script>
+		// elements
 		const nameInput = document.getElementById('nameInput');
 		const colorInput = document.getElementById('colorInput');
 		const fontSelect = document.getElementById('fontSelect');
 		const sizeRange = document.getElementById('sizeRange');
+		const sizeValue = document.getElementById('sizeValue');
 		const namePreview = document.getElementById('namePreview');
+		const product = document.getElementById('product');
+		const mockupSelect = document.getElementById('mockupSelect');
+		const bgUpload = document.getElementById('bgUpload');
+		const resetBtn = document.getElementById('resetBtn');
+		const presetBtns = document.querySelectorAll('.preset-btn');
 
-		function updatePreview() {
+		// storage keys and defaults
+		const STORAGE_KEYS = {
+			name: 'puc_name',
+			color: 'puc_color',
+			font: 'puc_font',
+			size: 'puc_size',
+			mockup: 'puc_mockup',
+			bgImage: 'puc_bgImage'
+		};
+
+		const DEFAULTS = { name: '', color: '#111111', font: "'Montserrat', sans-serif", size: 36, mockup: 'none', bgImage: null };
+
+		// helpers
+		function hexToRgb(hex){
+			const h = hex.replace('#','');
+			if(h.length===3){
+				return [parseInt(h[0]+h[0],16),parseInt(h[1]+h[1],16),parseInt(h[2]+h[2],16)];
+			}
+			return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+		}
+
+		function getLuminance(hex){
+			const rgb = hexToRgb(hex).map(v=>v/255).map(v=>{return v<=0.03928? v/12.92 : Math.pow((v+0.055)/1.055,2.4)});
+			return 0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2];
+		}
+
+		function applyTextContrast(hex){
+			const lum = getLuminance(hex);
+			if(lum > 0.6){
+				namePreview.style.textShadow = '0 1px 2px rgba(0,0,0,0.6)';
+			} else {
+				namePreview.style.textShadow = '0 1px 2px rgba(255,255,255,0.85)';
+			}
+		}
+
+		function saveToStorage(){
+			localStorage.setItem(STORAGE_KEYS.name, nameInput.value);
+			localStorage.setItem(STORAGE_KEYS.color, colorInput.value);
+			localStorage.setItem(STORAGE_KEYS.font, fontSelect.value);
+			localStorage.setItem(STORAGE_KEYS.size, sizeRange.value);
+			localStorage.setItem(STORAGE_KEYS.mockup, mockupSelect.value);
+		}
+
+		function saveBgImage(dataUrl){
+			if(dataUrl) localStorage.setItem(STORAGE_KEYS.bgImage, dataUrl);
+			else localStorage.removeItem(STORAGE_KEYS.bgImage);
+		}
+
+		function loadFromStorage(){
+			const name = localStorage.getItem(STORAGE_KEYS.name);
+			const color = localStorage.getItem(STORAGE_KEYS.color);
+			const font = localStorage.getItem(STORAGE_KEYS.font);
+			const size = localStorage.getItem(STORAGE_KEYS.size);
+			const mockup = localStorage.getItem(STORAGE_KEYS.mockup);
+			const bgImage = localStorage.getItem(STORAGE_KEYS.bgImage);
+
+			if(name !== null) nameInput.value = name;
+			if(color) colorInput.value = color;
+			if(font) fontSelect.value = font;
+			if(size) sizeRange.value = size;
+			if(mockup) mockupSelect.value = mockup;
+			if(bgImage){
+				product.style.backgroundImage = `url(${bgImage})`;
+				product.classList.add('has-bg-image');
+			}
+		}
+
+		function updatePreview(){
 			const name = nameInput.value.trim() || 'Your Name';
 			namePreview.textContent = name;
 			namePreview.style.color = colorInput.value;
 			namePreview.style.fontFamily = fontSelect.value;
 			namePreview.style.fontSize = sizeRange.value + 'px';
+			sizeValue.textContent = sizeRange.value + 'px';
+			applyTextContrast(colorInput.value);
+
+			// mockup handling
+			const current = mockupSelect.value;
+			product.classList.remove('show-tshirt','show-mug','show-poster');
+			if(current === 'tshirt') product.classList.add('show-tshirt');
+			if(current === 'mug') product.classList.add('show-mug');
+			if(current === 'poster') product.classList.add('show-poster');
+
+			// save
+			saveToStorage();
 		}
 
-		nameInput.addEventListener('input', updatePreview);
-		colorInput.addEventListener('input', updatePreview);
-		fontSelect.addEventListener('change', updatePreview);
-		sizeRange.addEventListener('input', updatePreview);
+		// event listeners
+		nameInput.addEventListener('input', ()=>{ updatePreview(); saveToStorage(); });
+		colorInput.addEventListener('input', ()=>{ updatePreview(); saveToStorage(); });
+		fontSelect.addEventListener('change', ()=>{ updatePreview(); saveToStorage(); });
+		sizeRange.addEventListener('input', ()=>{ updatePreview(); saveToStorage(); });
+		mockupSelect.addEventListener('change', ()=>{ updatePreview(); saveToStorage(); });
 
-		// initialize
+		// file upload for background image
+		bgUpload.addEventListener('change', (e)=>{
+			const file = e.target.files && e.target.files[0];
+			if(!file) return;
+			const reader = new FileReader();
+			reader.onload = function(ev){
+				const dataUrl = ev.target.result;
+				product.style.backgroundImage = `url(${dataUrl})`;
+				product.classList.add('has-bg-image');
+				saveBgImage(dataUrl);
+			};
+			reader.readAsDataURL(file);
+		});
+
+		// presets
+		presetBtns.forEach(btn=>{
+			btn.addEventListener('click', ()=>{
+				const font = btn.dataset.font;
+				const color = btn.dataset.color;
+				const size = btn.dataset.size;
+				fontSelect.value = font;
+				colorInput.value = color;
+				sizeRange.value = size;
+				updatePreview();
+				saveToStorage();
+			});
+		});
+
+		// reset
+		resetBtn.addEventListener('click', ()=>{
+			nameInput.value = DEFAULTS.name;
+			colorInput.value = DEFAULTS.color;
+			fontSelect.value = DEFAULTS.font;
+			sizeRange.value = DEFAULTS.size;
+			mockupSelect.value = DEFAULTS.mockup;
+			product.style.backgroundImage = '';
+			product.classList.remove('has-bg-image','show-tshirt','show-mug','show-poster');
+			// clear storage keys
+			Object.values(STORAGE_KEYS).forEach(k=>localStorage.removeItem(k));
+			updatePreview();
+		});
+
+		// initialize from storage
+		loadFromStorage();
 		updatePreview();
 	</script>
 </body>

@@ -29,9 +29,9 @@ h1{margin:0 0 18px 0;font-size:22px}
 	margin-bottom:20px;
 }
 .control-item{
-	display:flex;
-	flex-direction:column;
-	font-size:13px;
+  display:flex;
+  flex-direction:column;
+  font-size:13px;
 }
 .control-item input[type="text"], .control-item select{
 	padding:8px 10px;
@@ -64,6 +64,20 @@ h1{margin:0 0 18px 0;font-size:22px}
 	white-space:nowrap;
 	text-align:center;
 }
+
+.product.has-bg-image{background-size:cover;background-position:center}
+
+/* mockup SVGs */
+.mockup{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;height:auto;opacity:0.12;pointer-events:none;fill:#000}
+.show-tshirt .mockup-tshirt,.show-mug .mockup-mug,.show-poster .mockup-poster{opacity:0.22}
+
+.preset-buttons{display:flex;gap:8px;margin-top:8px}
+.preset-btn{padding:8px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
+.preset-btn:hover{box-shadow:0 2px 6px rgba(2,6,23,0.06)}
+.reset-btn{padding:8px 12px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
+
+.controls label{font-size:13px;color:#374151}
+.control-item .help-inline{font-size:12px;color:#6b7280;margin-top:6px}
 
 .help{color:#6b7280;font-size:13px}
 
