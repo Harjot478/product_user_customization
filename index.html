@@ -1,1 +1,73 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Product Personalization</title>
+	<link rel="stylesheet" href="style.css">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Great+Vibes&family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<h1>Personalize Your Product</h1>
+
+		<div class="controls">
+			<label class="control-item">Name
+				<input id="nameInput" type="text" placeholder="Type your name" autocomplete="off">
+			</label>
+
+			<label class="control-item">Color
+				<input id="colorInput" type="color" value="#111111">
+			</label>
+
+			<label class="control-item">Font
+				<select id="fontSelect">
+					<option value="'Montserrat', sans-serif">Montserrat</option>
+					<option value="'Roboto', sans-serif">Roboto</option>
+					<option value="'Great Vibes', cursive">Great Vibes</option>
+				</select>
+			</label>
+
+			<label class="control-item">Size
+				<input id="sizeRange" type="range" min="18" max="72" value="36">
+			</label>
+		</div>
+
+		<div class="product-wrap">
+			<div class="product">
+				<div class="product-face">
+					<span id="namePreview" class="name">Your Name</span>
+				</div>
+			</div>
+		</div>
+
+		<p class="help">Type a name and adjust color, font, and size — the preview updates live.</p>
+	</div>
+
+	<script>
+		const nameInput = document.getElementById('nameInput');
+		const colorInput = document.getElementById('colorInput');
+		const fontSelect = document.getElementById('fontSelect');
+		const sizeRange = document.getElementById('sizeRange');
+		const namePreview = document.getElementById('namePreview');
+
+		function updatePreview() {
+			const name = nameInput.value.trim() || 'Your Name';
+			namePreview.textContent = name;
+			namePreview.style.color = colorInput.value;
+			namePreview.style.fontFamily = fontSelect.value;
+			namePreview.style.fontSize = sizeRange.value + 'px';
+		}
+
+		nameInput.addEventListener('input', updatePreview);
+		colorInput.addEventListener('input', updatePreview);
+		fontSelect.addEventListener('change', updatePreview);
+		sizeRange.addEventListener('input', updatePreview);
+
+		// initialize
+		updatePreview();
+	</script>
+</body>
+</html>
+
