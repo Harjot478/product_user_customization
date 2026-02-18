@@ -69,10 +69,12 @@ h1{margin:0 0 18px 0;font-size:22px}
 
 /* mockup SVGs */
 .mockup{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;height:auto;opacity:0;pointer-events:none;fill:#000}
-/* only show the SVG for t‑shirt/poster; mug uses a raster image instead */
+/* show each mockup shape faintly; mug slightly more visible */
 .show-tshirt .mockup-tshirt,
-.show-mug .mockup-mug,
 .show-poster .mockup-poster{opacity:0.22}
+.show-mug .mockup-mug{opacity:0.5}
+/* ensure other mockups stay hidden */
+.show-mug .mockup-poster{opacity:0}
 
 /* mug image removed; SVG will display above */
 
